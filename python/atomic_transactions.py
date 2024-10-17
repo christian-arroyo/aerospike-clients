@@ -1,6 +1,7 @@
 import sys
 import aerospike
 from aerospike import GeoJSON
+from aerospike_helpers.operations import map_operations, operations
 
 # Host configuration
 
@@ -60,6 +61,36 @@ print('Record: ', bins)
 
 # Read specific bin
 (key, meta, bins) = client.select(key, ("report", "location"), policy=read_policy)
+print('Record: ', bins)
+
+# Update the record
+update_policy = {'exists': aerospike.POLICY_EXISTS_UPDATE}
+newPosted = {"posted": 20220602}
+client.put(key, newPosted, policy=update_policy)
+
+# Read whole record
+(key, meta, bins) = client.get(key, policy=read_policy)
+print('Record: ', bins)
+
+# Delete the bin setting it to null
+# removeBin = {'posted': aerospike.null()}
+# client.put(key, removeBin, policy=update_policy)
+
+# Deleting with durable delete policy prevents deleted objects from resurrection upon a cold restart
+# delete_policy = {'durable_delete': True}
+# client.remove(key, policy=delete_policy)
+
+# Create map policy
+map_policy = {'map_write_flags': aerospike.MAP_WRITE_FLAGS_DEFAULT}
+
+# Create operations
+ops = [
+    operations.write('posted', 20220602),
+    map_operations.map_put('report', 'city', 'Ypsilanti', map_policy),
+    operations.read('report')
+]
+# Update the record
+(key_, meta, bins) = client.operate(key, ops)
 print('Record: ', bins)
 
 # Close the connection to the server

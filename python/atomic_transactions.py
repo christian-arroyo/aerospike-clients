@@ -7,7 +7,7 @@ from aerospike_helpers.operations import map_operations, operations
 
 config = {
     'hosts': [ ('127.0.0.1', 3100), ('127.0.0.1', 3101), ('127.0.0.1', 3102), ('127.0.0.1', 3103)],
-    # Needed for multi-node cluster
+    # Needed for multi-node cluster, returns server configured external IP addresses that client uses to talk to nodes
     "use_services_alternate": True
 }
 

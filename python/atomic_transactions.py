@@ -18,7 +18,7 @@ except Exception as e:
     sys.exit()
 
 write_policy = {'key': aerospike.POLICY_KEY_SEND}
-key = ('test', 'ufodata', '5001')
+key = ('test', 'a_set', '5001')
 
 # Create the report map
 reportMap = {

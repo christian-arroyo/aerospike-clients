@@ -11,10 +11,8 @@ import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.ClientPolicy;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 
 
 /**

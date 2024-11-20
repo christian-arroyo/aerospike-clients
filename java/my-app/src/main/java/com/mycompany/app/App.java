@@ -1,14 +1,28 @@
 package com.mycompany.app;
 
 import com.aerospike.client.AerospikeClient;
-import com.aerospike.client.policy.WritePolicy;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
+import com.aerospike.client.Operation;
 import com.aerospike.client.Record;
 import com.aerospike.client.Value;
+import com.aerospike.client.cdt.MapOrder;
+import com.aerospike.client.cdt.MapOperation;
+import com.aerospike.client.cdt.MapPolicy;
+import com.aerospike.client.cdt.MapReturnType;
+import com.aerospike.client.cdt.MapWriteFlags;
+import com.aerospike.client.exp.Exp;
+import com.aerospike.client.exp.ExpOperation;
+import com.aerospike.client.exp.ExpWriteFlags;
+import com.aerospike.client.exp.ExpReadFlags;
+import com.aerospike.client.exp.Expression;
+import com.aerospike.client.exp.ListExp;
+import com.aerospike.client.exp.MapExp;
+import com.aerospike.client.policy.ClientPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.RecordExistsAction;
-import com.aerospike.client.policy.ClientPolicy;
+import com.aerospike.client.policy.WritePolicy;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,18 +104,79 @@ public class App {
         Record record2 = client.get(policy, key);
         System.out.format("Whole record, bins: %s\n", record2.bins);
 
-        // Delete record using client.put
-        Bin removeBin = Bin.asNull("report");
-        client.put(null, key, removeBin);
-        Record record3 = client.get(policy, key);
-        System.out.format("Whole record, bins : %s\n", record3.bins);
+        // // Delete record using client.put
+        // Bin removeBin = Bin.asNull("report");
+        // client.put(null, key, removeBin);
+        // Record record3 = client.get(policy, key);
+        // System.out.format("Whole record, bins : %s\n", record3.bins);
 
-        // Delete record using client.delete
-        WritePolicy deletePolicy = new WritePolicy();
-        deletePolicy.durableDelete = true;
-        client.delete(null, key);
-        boolean exists2 = client.exists(policy, key);
-        System.out.format("Exists: %s \n", exists2);
+        // // Delete record using client.delete
+        // WritePolicy deletePolicy = new WritePolicy();
+        // deletePolicy.durableDelete = true;
+        // client.delete(null, key);
+        // boolean exists2 = client.exists(policy, key);
+        // System.out.format("Exists: %s \n", exists2);
+
+        // Single operation. Create KEY_ORDERED map policy
+        MapPolicy mapPolicy = new MapPolicy(MapOrder.KEY_ORDERED, MapWriteFlags.DEFAULT);
+        client.operate(null, key, MapOperation.setMapPolicy(mapPolicy, "report"));
+        
+        // Multiple operations.
+        System.out.println("Multiple operations"); 
+        Bin posted2 = new Bin("posted", 20220602);
+        Record record4 = client.operate(null, key, 
+            Operation.put(posted2), 
+            MapOperation.put(MapPolicy.Default, "report", Value.get("city"), Value.get("Ypsilanti")), 
+            Operation.get("report")
+        );
+        System.out.format("Record : %s\n", record4.bins);
+
+        // Filter Read
+        System.out.println("Filter Read:");
+        Policy filter_read_policy = new Policy();
+        filter_read_policy.filterExp = Exp.build(
+            Exp.gt(
+                ListExp.size(
+                    MapExp.getByKey(MapReturnType.VALUE, Exp.Type.LIST, Exp.val("shape"), Exp.mapBin("report"))
+                ),
+                Exp.val(2)
+            )
+        );
+        Record filterReadRecord = client.get(filter_read_policy, key);
+        System.out.format("Record %s\n", filterReadRecord.bins);
+
+        // Filter Write
+        WritePolicy filterWritePolicy = new WritePolicy();
+        filterWritePolicy.filterExp = Exp.build(
+            Exp.and(
+                Exp.gt(Exp.intBin("occured"), Exp.val(20211231)),
+                Exp.binExists("posted")
+            )
+        );
+        client.operate(filterWritePolicy, key, MapOperation.put(MapPolicy.Default, "report", Value.get("recent"), Value.get(true)));
+
+        // Operation Expression Read
+        Expression operationReadExp = Exp.build(
+            ListExp.size(
+                MapExp.getByKey(MapReturnType.VALUE, Exp.Type.LIST, Exp.val("shape"), Exp.mapBin("report"))
+            )
+        );
+        Record operationExpReadRecord = client.operate(null, key, 
+            ExpOperation.read("numShapes", operationReadExp, ExpReadFlags.DEFAULT)
+        );
+        System.out.format("Record: %s\n", operationExpReadRecord.bins);
+
+        // Operation Expression Write
+        Expression exp = Exp.build(
+            MapExp.put(MapPolicy.Default, Exp.val("recent"), 
+                Exp.and(
+                    Exp.gt(Exp.intBin("occurred"), Exp.val(20211231)),
+                    Exp.binExists("posted")
+                ),
+                Exp.mapBin("report")
+            )
+        );
+        client.operate(null, key, ExpOperation.write("report", exp, ExpWriteFlags.DEFAULT));
 
         // Close connection
         client.close();

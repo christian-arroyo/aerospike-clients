@@ -50,6 +50,11 @@
       <artifactId>gson</artifactId>
       <version>2.11.0</version>
     </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-all</artifactId>
+      <version>4.1.115.Final</version>
+    </dependency>
   </dependencies>
 
   <build>

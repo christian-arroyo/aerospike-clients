@@ -116,8 +116,8 @@ public class App {
         // client.delete(null, key);
         // boolean exists2 = client.exists(policy, key);
         // System.out.format("Exists: %s \n", exists2);
-
         // Single operation. Create KEY_ORDERED map policy
+        
         MapPolicy mapPolicy = new MapPolicy(MapOrder.KEY_ORDERED, MapWriteFlags.DEFAULT);
         client.operate(null, key, MapOperation.setMapPolicy(mapPolicy, "report"));
         

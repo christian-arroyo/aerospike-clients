@@ -1,7 +1,5 @@
 package com.mycompany.app;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.AerospikeException;
 import com.aerospike.client.Key;
@@ -14,7 +12,7 @@ import com.aerospike.client.async.EventLoops;
 import com.aerospike.client.async.EventPolicy;
 import com.aerospike.client.async.Monitor;
 import com.aerospike.client.async.NettyEventLoops;
-import com.aerospike.client.async.NioEventLoops;
+// import com.aerospike.client.async.NioEventLoops;
 import com.aerospike.client.cdt.ListOperation;
 import com.aerospike.client.listener.RecordListener;
 import com.aerospike.client.policy.ClientPolicy;
@@ -39,7 +37,7 @@ public final class TransactionsExercise {
     private EventLoops eventLoops;
     private final Monitor monitor = new Monitor();
     // private final AtomicInteger recordCount = new AtomicInteger();
-    private final int numElements = 100;
+    private final int numElements = 1000;
     private final Key key = new Key("test", "testSet", 123);
     private final int writeTimeout = 5000;
     private final int eventLoopSize = Runtime.getRuntime().availableProcessors();

@@ -1,5 +1,6 @@
 package com.mycompany.app;
 
+import com.aerospike.client.Host;
 import com.aerospike.client.AerospikeClient;
 import com.aerospike.client.Bin;
 import com.aerospike.client.Key;
@@ -18,9 +19,11 @@ import com.aerospike.client.exp.ExpReadFlags;
 import com.aerospike.client.exp.Expression;
 import com.aerospike.client.exp.ListExp;
 import com.aerospike.client.exp.MapExp;
+import com.aerospike.client.policy.AuthMode;
 import com.aerospike.client.policy.ClientPolicy;
 import com.aerospike.client.policy.Policy;
 import com.aerospike.client.policy.RecordExistsAction;
+import com.aerospike.client.policy.TlsPolicy;
 import com.aerospike.client.policy.WritePolicy;
 
 
@@ -51,8 +54,7 @@ public class App {
         WritePolicy updatePolicy = new WritePolicy();
         updatePolicy.recordExistsAction = RecordExistsAction.UPDATE_ONLY;
 
-        // Establish a connection to the server
-        AerospikeClient client = new AerospikeClient(clientPolicy, "localhost", 3100);
+        AerospikeClient client = new AerospikeClient(clientPolicy, "localhost", 3104);
 
         Key key = new Key("test", "test", 123456789);
         

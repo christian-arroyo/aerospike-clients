@@ -27,7 +27,10 @@ public class App2 {
         // Connection
         ClientPolicy clientPolicy = new ClientPolicy();
         clientPolicy.useServicesAlternate = true;
+        //System.setProperty("javax.net.ssl.trustStore", "/Users/carroyo/tls/truststore.jks");
+
         AerospikeClient client = new AerospikeClient(clientPolicy, "127.0.0.1", 3100);
+        
         
         Policy policy = new Policy();
         policy.socketTimeout = 0;

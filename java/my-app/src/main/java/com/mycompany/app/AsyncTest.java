@@ -81,7 +81,7 @@ public final class AsyncTest {
             // if eventLoopSize >= 8.
             clientPolicy.maxConnsPerNode = concurrentMax;
             clientPolicy.writePolicyDefault.setTimeout(writeTimeout);
-            client = new AerospikeClient(clientPolicy, "localhost", 3100);
+            client = new AerospikeClient(clientPolicy, "localhost", 3102);
 
             try {
                 writeRecords();
